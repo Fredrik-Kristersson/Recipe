@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Castle.ActiveRecord;
 
-namespace Recipe.Model.Database
+namespace Recipes.Model.Database
 {
 	[ActiveRecord, Serializable]
 	public class RecipeVO : ValueObjectBase

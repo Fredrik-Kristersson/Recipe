@@ -6,20 +6,24 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Castle.ActiveRecord;
-using Recipe.Model.Database;
+using Recipes.Model.Database;
 using ViewModelLib;
 
-namespace Recipe.ViewModel
+namespace Recipes.ViewModel
 {
-	public class MainWindowViewModel : ViewModelBase
+	public class MainWindowViewModel : ViewModelBase, IMainWindowViewModel
 	{
 		private readonly IDialogService dialogService;
+		private readonly IRecipeDialogViewModel recipeDialogViewModel;
 
-		public MainWindowViewModel(IDialogService dialogService)
+		public MainWindowViewModel(
+			IDialogService dialogService,
+			IRecipeDialogViewModel recipeDialogViewModel)
 		{
 			MainTab = new MainTabViewModel();
 			Tabs = new ObservableCollection<TabViewModelBase>();
 
+			this.recipeDialogViewModel = recipeDialogViewModel;
 			this.dialogService = dialogService;
 
 			OpenSourceCommand = new MyCommand(OpenSource);
@@ -84,11 +88,10 @@ namespace Recipe.ViewModel
 
 		private void AddRecipe(object obj)
 		{
-			var addRecipeDialogViewModel = new AddRecipeDialogViewModel(dialogService);
-
-			if (dialogService.OpenDialogWindow(typeof(AddRecipeDialog), addRecipeDialogViewModel, this) == true)
+			recipeDialogViewModel.Recipe = new Recipe();
+			if (dialogService.OpenDialogWindow(typeof(AddRecipeDialog), recipeDialogViewModel, this) == true)
 			{
-				RecipeVO newRecipe = ToRecipeVO(addRecipeDialogViewModel.Model);
+				RecipeVO newRecipe = ToRecipeVO(recipeDialogViewModel.Recipe);
 				newRecipe.Create();
 				MainTab.RefreshRecipesFromModel();
 			}
@@ -121,15 +124,11 @@ namespace Recipe.ViewModel
 			}
 
 			var clone = MainTab.SelectedRecipe.Clone() as Recipe;
-			if (clone == null)
-			{
-				throw new ArgumentException("Recipe was not cloned correctly.");
-			}
-			var editRecipeDialogViewModel = new AddRecipeDialogViewModel(dialogService, clone);
+			recipeDialogViewModel.Recipe = clone ?? throw new ArgumentException("Recipe was not cloned correctly.");
 
-			if (dialogService.OpenDialogWindow(typeof(AddRecipeDialog), editRecipeDialogViewModel, this) == true)
+			if (dialogService.OpenDialogWindow(typeof(AddRecipeDialog), recipeDialogViewModel, this) == true)
 			{
-				var recipe = editRecipeDialogViewModel.Model;
+				var recipe = recipeDialogViewModel.Recipe;
 
 				RecipeVO edited = ActiveRecordBase<RecipeVO>.Find(recipe.Id);
 				edited.Description = recipe.Description;

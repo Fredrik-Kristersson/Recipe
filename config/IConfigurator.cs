@@ -1,4 +1,4 @@
-﻿namespace Recipe.config
+﻿namespace Recipes.config
 {
 	interface IConfigurator
 	{

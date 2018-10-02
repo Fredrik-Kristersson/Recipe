@@ -3,12 +3,12 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using Recipe.ViewModel;
-using ViewModelLib;
+using Recipes.config;
+using Recipes.ViewModel;
 
-namespace Recipe
+namespace Recipes
 {
-	public partial class Window1
+	public partial class Window1 : Window
 	{
 
 		private const string EmptyFilterValue = "...";
@@ -21,14 +21,13 @@ namespace Recipe
 
 		private readonly MainWindowViewModel viewModel;
 
-		private IDialogService diagService;
+		//private IDialogService diagService;
 
 		public Window1()
 		{
 			InitializeComponent();
 			// Insert code required on object creation below this point.            
-			diagService = new DefaultDialogService(this);
-			viewModel = new MainWindowViewModel(diagService);
+			var viewModel = ContainerBootstrapper.Resolve<IMainWindowViewModel>();
 			DataContext = viewModel;
 		}
 

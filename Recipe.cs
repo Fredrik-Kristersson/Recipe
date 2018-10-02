@@ -1,7 +1,7 @@
 using System;
 using ViewModelLib;
 
-namespace Recipe
+namespace Recipes
 {
 	public class Recipe : ViewModelBase
 	{

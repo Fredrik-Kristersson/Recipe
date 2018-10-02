@@ -1,8 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using Recipe.ViewModel;
+using Recipes.ViewModel;
 
-namespace Recipe
+namespace Recipes
 {
 	public class TabContentTemplateSelector : DataTemplateSelector
 	{

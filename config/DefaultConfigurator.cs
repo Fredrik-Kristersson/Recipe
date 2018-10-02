@@ -3,9 +3,9 @@ using System.IO;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using log4net.Config;
-using Recipe.Model.Database;
+using Recipes.Model.Database;
 
-namespace Recipe.config
+namespace Recipes.config
 {
 	class DefaultConfigurator : IConfigurator
 	{

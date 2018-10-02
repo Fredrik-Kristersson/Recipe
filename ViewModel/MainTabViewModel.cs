@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Recipe.Model.Database;
+using Recipes.Model.Database;
 
-namespace Recipe.ViewModel
+namespace Recipes.ViewModel
 {
-	public class MainTabViewModel : TabViewModelBase
+	public class MainTabViewModel : TabViewModelBase, IMainTabViewModel
 	{
 		public MainTabViewModel()
 		{

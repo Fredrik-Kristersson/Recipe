@@ -1,11 +1,12 @@
 ﻿using System.Windows;
-using Recipe.config;
-using Unity;
+using Autofac;
+using Recipes.config;
 
-namespace Recipe
+namespace Recipes
 {
 	public partial class App : System.Windows.Application
 	{
+		IContainer container;
 
 		private void App_Startup(object sender, StartupEventArgs e)
 		{
@@ -14,13 +15,11 @@ namespace Recipe
 
 		private void SetupConfiguration()
 		{
-			IConfigurator configurator = new DefaultConfigurator();
+			container = ContainerBootstrapper.Configure();
+
+			IConfigurator configurator = container.Resolve<IConfigurator>();
 			configurator.ConfigureLog4Net("log4net_config.xml");
 			configurator.SetupDatabase("database.db", "appconfig.xml");
-
-			var container = new UnityContainer();
-			var bootstrapper = new ContainerBootstrapper();
-			bootstrapper.RegisterTypes(container);
 		}
 	}
 }

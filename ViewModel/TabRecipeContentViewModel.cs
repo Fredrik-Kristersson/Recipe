@@ -1,6 +1,6 @@
-﻿namespace Recipe.ViewModel
+﻿namespace Recipes.ViewModel
 {
-	public class TabRecipeContentViewModel : TabViewModelBase
+	public class TabRecipeContentViewModel : TabViewModelBase, ITabRecipeContentViewModel
 	{
 		public TabRecipeContentViewModel(Recipe model)
 		{

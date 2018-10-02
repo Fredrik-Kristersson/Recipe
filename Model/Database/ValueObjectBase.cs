@@ -1,7 +1,7 @@
 using System;
 using Castle.ActiveRecord;
 
-namespace Recipe.Model.Database
+namespace Recipes.Model.Database
 {
 	[ActiveRecord, Serializable]
 	public abstract class ValueObjectBase : ActiveRecordBase

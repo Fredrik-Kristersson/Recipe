@@ -1,10 +1,9 @@
 ﻿using ViewModelLib;
 
-namespace Recipe.ViewModel
+namespace Recipes.ViewModel
 {
-	public abstract class TabViewModelBase : ViewModelBase
+	public abstract class TabViewModelBase : ViewModelBase, ITabViewModelBase
 	{
-
 		public abstract string TabName { get; }
 
 		public abstract bool IsCloseable { get; }

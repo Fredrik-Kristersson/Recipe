@@ -1,7 +1,6 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
-namespace Recipe
+namespace Recipes
 {
 	public partial class TabRecipeContent : UserControl
 	{
