@@ -1,19 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Recipes.Model;
+using Recipes.Service;
 using System.Collections.ObjectModel;
-using System.Linq;
-using Recipes.Model.Database;
+using System.ComponentModel.Composition;
+using ViewModelLib.Event;
 
 namespace Recipes.ViewModel
 {
+	[Export(typeof(IMainTabViewModel))]
 	public class MainTabViewModel : TabViewModelBase, IMainTabViewModel
 	{
-		public MainTabViewModel()
+		private readonly IRecipeService recipeService;
+
+		[ImportingConstructor]
+		public MainTabViewModel(
+			IEventMessenger eventMessenger,
+			IRecipeService recipeService) : base()
 		{
 			Recipes = new ObservableCollection<Recipe>();
 
+			eventMessenger.Subscribe<RecipesUpdatedEvent>(OnRecipesUpdated);
+			this.recipeService = recipeService;
 
-			RefreshRecipesFromModel();
+			UpdateRecipes();
 		}
 
 		public Recipe SelectedRecipe
@@ -28,39 +36,19 @@ namespace Recipes.ViewModel
 
 		public override bool IsCloseable => false;
 
-		internal void RefreshRecipesFromModel()
+		private void OnRecipesUpdated(RecipesUpdatedEvent obj)
 		{
-			try
-			{
-				Recipes.Clear();
-				IList<RecipeVO> recipes = RecipeVO.FindAllRecipes().ToList();
-				foreach (RecipeVO recipe in recipes)
-				{
-					Recipe curr = ToRecipe(recipe);
-					Recipes.Add(curr);
-				}
-			}
-			catch (Exception ex)
-			{
-				while (ex != null)
-				{
-					Console.Out.WriteLine("Message: " + ex.Message);
-					ex = ex.InnerException;
-				}
-			}
+			UpdateRecipes();
 		}
 
-		private Recipe ToRecipe(RecipeVO recipe)
+		private void UpdateRecipes()
 		{
-			Recipe curr = new Recipe();
-			curr.Id = recipe.Id;
-			curr.Name = recipe.Name;
-			curr.Grade = recipe.Grade;
-			curr.Image = recipe.Image;
-			curr.Source = recipe.Source;
-			curr.Url = recipe.Url;
-			curr.Description = recipe.Description;
-			return curr;
+			Recipes.Clear();
+
+			foreach (var recipe in recipeService.GetAllRecipes())
+			{
+				Recipes.Add(recipe);
+			}
 		}
 	}
 }

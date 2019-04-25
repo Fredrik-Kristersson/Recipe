@@ -2,7 +2,7 @@
 
 namespace Recipes.ViewModel
 {
-	public interface IMainWindowViewModel : IViewModelBase
+	public interface IMainWindowViewModel : IDialogViewModelBase
 	{
 	}
 }

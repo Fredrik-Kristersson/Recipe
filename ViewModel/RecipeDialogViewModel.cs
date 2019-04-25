@@ -1,101 +1,62 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 using System.Windows.Input;
-using Microsoft.Win32;
 using ViewModelLib;
 
 namespace Recipes.ViewModel
 {
-	public class RecipeDialogViewModel : ViewModelBase, IRecipeDialogViewModel
+	[Export(typeof(IRecipeDialogViewModel))]
+	[PartCreationPolicy(CreationPolicy.NonShared)]
+	public class RecipeDialogViewModel : DialogViewModelBase, IRecipeDialogViewModel
 	{
-		private readonly IDialogService dialogService;
-
-		public RecipeDialogViewModel(IDialogService dialogService)
+		[ImportingConstructor]
+		public RecipeDialogViewModel(IDialogService dialogService) : base(dialogService)
 		{
 			SelectImageCommand = new MyCommand(SelectImage);
-			this.dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+
+			AddValidator(nameof(Name), () => string.IsNullOrEmpty(Name), "Name me!");
 		}
 
 		public ICommand SelectImageCommand { get; }
 
-		public Recipe Recipe { get; set; }
-
 		public string Name
 		{
-			get { return Recipe.Name; }
-			set
-			{
-				if (Recipe.Name == value) return;
-				Recipe.Name = value;
-				OnPropertyChanged("Name");
-			}
+			get { return Get<string>(); }
+			set { Set(value); }
 		}
 
 		public string Description
 		{
-			get { return Recipe.Description; }
-			set
-			{
-				if (Recipe.Description == value) return;
-				Recipe.Description = value;
-				OnPropertyChanged("Description");
-			}
+			get { return Get<string>(); }
+			set { Set(value); }
 		}
 		public string Image
 		{
-			get { return Recipe.Image; }
-			set
-			{
-				if (Recipe.Image == value) return;
-				Recipe.Image = value;
-				OnPropertyChanged("Image");
-			}
+			get { return Get<string>(); }
+			set { Set(value); }
 		}
 
 		public string Source
 		{
-			get { return Recipe.Source; }
-			set
-			{
-				if (Recipe.Source == value) return;
-				Recipe.Source = value;
-				OnPropertyChanged("Source");
-			}
+			get { return Get<string>(); }
+			set { Set(value); }
 		}
 
-		public string Grade
+		public double Grade
 		{
-			get { return Recipe.Grade; }
+			get { return Get<double>(); }
 			set
 			{
-				if (Recipe.Grade == value) return;
-				Recipe.Grade = value;
-				OnPropertyChanged("Grade");
+				var roundedValue = Math.Round(value, 1);
+				Set(roundedValue);
 			}
 		}
 
 		private void SelectImage(object obj)
 		{
-			dialogService.OpenFileDialog("");
-			var dialog = new OpenFileDialog { Multiselect = false };
-			if (!string.IsNullOrEmpty(Image))
+			if (DialogService.OpenFileDialog("", out string filePath, Image))
 			{
-				dialog.FileName = Image;
-			}
-
-			bool? result = null;
-			try
-			{
-				result = dialog.ShowDialog(null);
-			}
-			catch (InvalidOperationException)
-			{
-				dialog.FileName = string.Empty;
-				result = dialog.ShowDialog(null);
-			}
-
-			if (result == true)
-			{
-				Image = dialog.FileName;
+				Image = filePath;
 			}
 		}
 	}

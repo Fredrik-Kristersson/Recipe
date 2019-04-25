@@ -1,15 +1,10 @@
 using System;
 using ViewModelLib;
 
-namespace Recipes
+namespace Recipes.Model
 {
 	public class Recipe : ViewModelBase
 	{
-		public Recipe()
-		{
-
-		}
-
 		public int Id
 		{
 			get => Get<int>();

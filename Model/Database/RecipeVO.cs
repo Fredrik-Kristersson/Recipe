@@ -1,7 +1,7 @@
+using Castle.ActiveRecord;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Castle.ActiveRecord;
 
 namespace Recipes.Model.Database
 {
@@ -9,14 +9,14 @@ namespace Recipes.Model.Database
 	public class RecipeVO : ValueObjectBase
 	{
 		[Property]
-
 		public string Name { get; set; }
-		[Property]
 
+		[Property]
 		public string Grade { get; set; }
-		[Property]
 
+		[Property]
 		public string Source { get; set; }
+
 		[Property]
 		public string Url { get; set; }
 

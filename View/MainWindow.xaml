@@ -4,13 +4,13 @@
 	xmlns:clr="clr-namespace:System;assembly=mscorlib"
 	xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
 	xmlns:viewmodel="clr-namespace:Recipes.ViewModel"
-	x:Class="Recipes.Window1"
+	x:Class="Recipes.View.MainWindow"
 	xmlns:local="clr-namespace:Recipes"
+	xmlns:view="clr-namespace:Recipes.View"
 	Title="Recipe store"
 	Width="640" Height="480"
-	Loaded="Window_Loaded"
 	MinHeight="200" MinWidth="200"
-	Background="{DynamicResource BackgroundBrushGray}">
+	Background="{StaticResource BackgroundBrushGray}">
 
 	<Window.Resources>
 		<CollectionViewSource Source="{Binding Recipes}" x:Key="RecipesView" IsLiveFilteringRequested="True" IsLiveSortingRequested="True">
@@ -22,7 +22,7 @@
 			</CollectionViewSource.SortDescriptions>
 		</CollectionViewSource>
 
-		<local:TabContentTemplateSelector x:Key="TabContentTemplateSelector" />
+		<view:TabContentTemplateSelector x:Key="TabContentTemplateSelector" />
 
 		<Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}" x:Key="CloseButtonStyle">
 			<Setter Property="Command" Value="{Binding DataContext.CloseRecipeCommand,RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
@@ -71,8 +71,7 @@
 		<Style TargetType="TabItem">
 			<Setter Property="HeaderTemplate">
 				<Setter.Value>
-					<DataTemplate DataType="local:TabViewModel">
-
+					<DataTemplate>
 						<StackPanel Orientation="Horizontal" Margin="5">
 							<TextBlock Text="{Binding TabName}"/>
 							<Button 
@@ -216,7 +215,12 @@
 					<RowDefinition Height="Auto"/>
 					<RowDefinition Height="*"/>
 				</Grid.RowDefinitions>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="0.6*"/>
+					<ColumnDefinition Width="0.4*"/>
+				</Grid.ColumnDefinitions>
 				<TextBlock
+					Grid.ColumnSpan="2"
 					HorizontalAlignment="Center"
 					Text="{Binding Name}"
 					FontSize="20"/>
@@ -226,9 +230,14 @@
 					TextWrapping="Wrap"
 					BorderThickness="0"
 					Text="{Binding Description}"/>
+				<Image 
+					Grid.Row="1"
+					Grid.Column="1"
+					HorizontalAlignment="Right" 
+					VerticalAlignment="Top"
+					Source="{Binding Image}"/>
 			</Grid>
 		</DataTemplate>
-
 	</Window.Resources>
 
 	<Grid x:Name="LayoutRoot">
@@ -262,9 +271,6 @@
 				<StatusBar>
 					<StatusBarItem Content="{Binding MainTab.Recipes.Count}" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Center"/>
 					<StatusBarItem Content="Recipes" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-					<Separator/>
-					<StatusBarItem Content=""/>
-					<Slider Minimum="0" Maximum="2" Width="100" Interval="1" Value="{Binding Path=Position}"/>>
 				</StatusBar>
 			</Border>
 		</Grid>

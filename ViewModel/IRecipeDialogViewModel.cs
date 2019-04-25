@@ -2,8 +2,16 @@
 
 namespace Recipes.ViewModel
 {
-	public interface IRecipeDialogViewModel : IViewModelBase
+	public interface IRecipeDialogViewModel : IDialogViewModelBase
 	{
-		Recipe Recipe { get; set; }
+		string Name { get; set; }
+
+		string Description { get; set; }
+
+		string Image { get; set; }
+
+		string Source { get; set; }
+
+		double Grade { get; set; }
 	}
 }

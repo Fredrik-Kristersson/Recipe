@@ -1,14 +1,13 @@
-﻿using System.ComponentModel;
+﻿using Recipes.Model;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using Recipes.config;
-using Recipes.ViewModel;
 
-namespace Recipes
+namespace Recipes.View
 {
-	public partial class Window1 : Window
+	public partial class MainWindow : Window
 	{
 
 		private const string EmptyFilterValue = "...";
@@ -19,16 +18,10 @@ namespace Recipes
 
 		ListSortDirection lastDirection = ListSortDirection.Ascending;
 
-		private readonly MainWindowViewModel viewModel;
-
-		//private IDialogService diagService;
-
-		public Window1()
+		public MainWindow()
 		{
 			InitializeComponent();
-			// Insert code required on object creation below this point.            
-			var viewModel = ContainerBootstrapper.Resolve<IMainWindowViewModel>();
-			DataContext = viewModel;
+			// Insert code required on object creation below this point.
 		}
 
 		private void filterBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -67,12 +60,6 @@ namespace Recipes
 		{
 			sortIn.SortDescriptions.Clear();
 			sortIn.SortDescriptions.Add(new SortDescription(sortBy, direction));
-		}
-
-		private void Window_Loaded(object sender, RoutedEventArgs e)
-		{
-			//tableView = CollectionViewSource.GetDefaultView(recipeTable.ItemsSource);
-			//tableView.Filter = FilterCallback;
 		}
 
 		private bool FilterCallback(object item)

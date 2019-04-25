@@ -1,12 +1,15 @@
-﻿using System.Windows;
-using Autofac;
-using Recipes.config;
+﻿using Recipes.View;
+using Recipes.ViewModel;
+using System;
+using System.IO;
+using System.Windows;
+using ViewModelLib;
+using ViewModelLib.Boot;
 
 namespace Recipes
 {
 	public partial class App : System.Windows.Application
 	{
-		IContainer container;
 
 		private void App_Startup(object sender, StartupEventArgs e)
 		{
@@ -15,11 +18,18 @@ namespace Recipes
 
 		private void SetupConfiguration()
 		{
-			container = ContainerBootstrapper.Configure();
+			string logFilePath = Path.Combine(Environment.CurrentDirectory, "log4net_config.xml");
 
-			IConfigurator configurator = container.Resolve<IConfigurator>();
-			configurator.ConfigureLog4Net("log4net_config.xml");
-			configurator.SetupDatabase("database.db", "appconfig.xml");
+			var container = BootStrapper.Compose(this, logFilePath);
+
+			var dbConfigurator = container.GetExport<IDatabaseStarter>();
+
+			dbConfigurator.SetupDatabase("database.db", "appconfig.xml", GetType().Assembly);
+
+			var mainViewModel = container.GetExport<IMainWindowViewModel>();
+			var dialogService = container.GetExport<IDialogService>();
+
+			dialogService.OpenWindow(typeof(MainWindow), mainViewModel);
 		}
 	}
 }

@@ -1,42 +1,73 @@
-﻿
+﻿using log4net;
+using Recipes.Model;
+using Recipes.Service;
+using Recipes.View;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Castle.ActiveRecord;
-using Recipes.Model.Database;
 using ViewModelLib;
+using ViewModelLib.Boot;
 
 namespace Recipes.ViewModel
 {
-	public class MainWindowViewModel : ViewModelBase, IMainWindowViewModel
+	[Export(typeof(IMainWindowViewModel))]
+	public class MainWindowViewModel : DialogViewModelBase, IMainWindowViewModel
 	{
-		private readonly IDialogService dialogService;
-		private readonly IRecipeDialogViewModel recipeDialogViewModel;
+		private readonly IRecipeService recipeService;
+		private readonly IContainer container;
+		private ILog log;
 
+		[ImportingConstructor]
 		public MainWindowViewModel(
+			IRecipeService recipeService,
 			IDialogService dialogService,
-			IRecipeDialogViewModel recipeDialogViewModel)
+			IMainTabViewModel mainTabViewModel,
+			ILogger logger,
+			IContainer container,
+			ICommandFactory commandFactory) : base(dialogService)
 		{
-			MainTab = new MainTabViewModel();
-			Tabs = new ObservableCollection<TabViewModelBase>();
+			log = logger.GetLogger(GetType());
+			MainTab = mainTabViewModel;
+			this.container = container;
+			Tabs = new ObservableCollection<ITabViewModelBase>();
+			this.recipeService = recipeService;
 
-			this.recipeDialogViewModel = recipeDialogViewModel;
-			this.dialogService = dialogService;
+			OpenSourceCommand = commandFactory.CreateCommand(OpenSource);
+			EditRecipeCommand = commandFactory.CreateCommand(EditRecipe);
+			AddRecipeCommand = commandFactory.CreateCommand(AddRecipe);
+			OpenRecipeCommand = commandFactory.CreateCommand(OpenRecipe);
+			CloseRecipeCommand = commandFactory.CreateCommand(CloseRecipe);
+			RemoveRecipeCommand = commandFactory.CreateCommand(RemoveRecipe);
 
-			OpenSourceCommand = new MyCommand(OpenSource);
-			EditRecipeCommand = new MyCommand(EditRecipe);
-			AddRecipeCommand = new MyCommand(AddRecipe);
-			OpenRecipeCommand = new MyCommand(OpenRecipe);
-			CloseRecipeCommand = new MyCommand(CloseRecipe);
-			RemoveRecipeCommand = new MyCommand(RemoveRecipe);
-
-			AddMainTab();
+			Tabs.Add(MainTab);
 		}
 
 		public ObservableCollection<Recipe> Recipes => MainTab.Recipes;
+
+		public ICommand OpenSourceCommand { get; }
+		public ICommand EditRecipeCommand { get; }
+		public ICommand AddRecipeCommand { get; }
+		public ICommand CloseRecipeCommand { get; }
+		public ICommand OpenRecipeCommand { get; }
+		public ICommand RemoveRecipeCommand { get; }
+
+		public ObservableCollection<ITabViewModelBase> Tabs { get; }
+
+		public IMainTabViewModel MainTab
+		{
+			get => Get<IMainTabViewModel>();
+			set => Set(value);
+		}
+
+		public int TabSelectedIndex
+		{
+			get => Get<int>();
+			set => Set(value);
+		}
 
 		private void OpenSource(object obj)
 		{
@@ -52,48 +83,29 @@ namespace Recipes.ViewModel
 					Process.Start(url.ToString());
 				}
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				//log.Error("Error occurred!", ex);
+				log.Error("Error occurred when opening source.", ex);
 			}
-		}
-
-		public ICommand OpenSourceCommand { get; }
-		public ICommand EditRecipeCommand { get; }
-		public ICommand AddRecipeCommand { get; }
-		public ICommand CloseRecipeCommand { get; }
-		public ICommand OpenRecipeCommand { get; }
-		public MyCommand RemoveRecipeCommand { get; }
-
-		public ObservableCollection<TabViewModelBase> Tabs { get; }
-
-		public MainTabViewModel MainTab
-		{
-			get => Get<MainTabViewModel>();
-			set => Set(value);
-		}
-
-
-		public int Position
-		{
-			get => Get<int>();
-			set => Set(value);
-		}
-
-		public int TabSelectedIndex
-		{
-			get => Get<int>();
-			set => Set(value);
 		}
 
 		private void AddRecipe(object obj)
 		{
-			recipeDialogViewModel.Recipe = new Recipe();
-			if (dialogService.OpenDialogWindow(typeof(AddRecipeDialog), recipeDialogViewModel, this) == true)
+			var recipeDialogViewModel = container.GetExport<IRecipeDialogViewModel>();
+
+			if (DialogService.OpenDialogWindow(typeof(AddRecipeDialog), recipeDialogViewModel, this) == true)
 			{
-				RecipeVO newRecipe = ToRecipeVO(recipeDialogViewModel.Recipe);
-				newRecipe.Create();
-				MainTab.RefreshRecipesFromModel();
+				var recipe = new Recipe
+				{
+					Name = recipeDialogViewModel.Name,
+					Description = recipeDialogViewModel.Description,
+					Grade = GradeConverter.Convert(recipeDialogViewModel.Grade),
+					Image = recipeDialogViewModel.Image,
+					Source = recipeDialogViewModel.Source,
+					Url = recipeDialogViewModel.Source
+				};
+
+				recipeService.AddRecipe(recipe);
 			}
 		}
 
@@ -106,53 +118,43 @@ namespace Recipes.ViewModel
 
 			string message = $"Are you sure you want to delete [{MainTab.SelectedRecipe.Name}]";
 
-			if (dialogService.ShowMessageBox(this, "Remove Recipe?", message, MessageBoxButton.YesNo,
+			if (DialogService.ShowMessageBox("Remove Recipe?", message, MessageBoxButton.YesNo,
 				MessageBoxImage.Question) == MessageBoxResult.Yes)
 			{
-				RecipeVO recipeVo = ActiveRecordBase<RecipeVO>.Find(MainTab.SelectedRecipe.Id);
-				recipeVo.Delete();
-
-				MainTab.RefreshRecipesFromModel();
+				recipeService.RemoveRecipe(MainTab.SelectedRecipe.Id);
 			}
 		}
 
-		public void EditRecipe(object o)
+		private void EditRecipe(object o)
 		{
 			if (MainTab.SelectedRecipe == null)
 			{
 				return;
 			}
 
-			var clone = MainTab.SelectedRecipe.Clone() as Recipe;
-			recipeDialogViewModel.Recipe = clone ?? throw new ArgumentException("Recipe was not cloned correctly.");
+			var recipeDialogViewModel = container.GetExport<IRecipeDialogViewModel>();
+			var oldRecipe = MainTab.SelectedRecipe;
+			recipeDialogViewModel.Name = oldRecipe.Name;
+			recipeDialogViewModel.Description = oldRecipe.Description;
+			recipeDialogViewModel.Grade = GradeConverter.Convert(oldRecipe.Grade);
+			recipeDialogViewModel.Source = oldRecipe.Source;
+			recipeDialogViewModel.Image = oldRecipe.Image;
 
-			if (dialogService.OpenDialogWindow(typeof(AddRecipeDialog), recipeDialogViewModel, this) == true)
+			if (DialogService.OpenDialogWindow(typeof(AddRecipeDialog), recipeDialogViewModel, this) == true)
 			{
-				var recipe = recipeDialogViewModel.Recipe;
+				var recipe = new Recipe
+				{
+					Id = oldRecipe.Id,
+					Name = recipeDialogViewModel.Name,
+					Description = recipeDialogViewModel.Description,
+					Grade = GradeConverter.Convert(recipeDialogViewModel.Grade),
+					Image = recipeDialogViewModel.Image,
+					Source = recipeDialogViewModel.Source,
+					Url = recipeDialogViewModel.Source
+				};
 
-				RecipeVO edited = ActiveRecordBase<RecipeVO>.Find(recipe.Id);
-				edited.Description = recipe.Description;
-				edited.Grade = recipe.Grade;
-				edited.Image = recipe.Image;
-				edited.Name = recipe.Name;
-				edited.Source = recipe.Source;
-				edited.Url = recipe.Url;
-				edited.SaveCopy();
-				MainTab.RefreshRecipesFromModel();
+				recipeService.EditRecipe(recipe);
 			}
-		}
-
-		private RecipeVO ToRecipeVO(Recipe recipe)
-		{
-			RecipeVO curr = new RecipeVO();
-			curr.Id = recipe.Id;
-			curr.Name = recipe.Name;
-			curr.Grade = recipe.Grade;
-			curr.Image = recipe.Image;
-			curr.Source = recipe.Source;
-			curr.Url = recipe.Url;
-			curr.Description = recipe.Description;
-			return curr;
 		}
 
 		private Recipe FindRecipeFromName(string name)
@@ -171,39 +173,30 @@ namespace Recipes.ViewModel
 						Recipe rec = FindRecipeFromName(name);
 						if (rec != null)
 						{
-							var tabViewModel = new TabRecipeContentViewModel(rec);
+							var tabViewModel = new TabRecipeContentViewModel();
+							tabViewModel.Name = rec.Name;
+							tabViewModel.Description = rec.Description;
+							tabViewModel.Image = rec.Image;
 							Tabs.Add(tabViewModel);
 							TabSelectedIndex = Tabs.Count - 1;
 						}
 					}
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
-					//log.Error("Error occurred!", ex);
+					log.Error("Error occurred!", ex);
 				}
 			}
 		}
 
-		private void AddMainTab()
-		{
-			Tabs.Add(MainTab);
-		}
-
 		private void CloseRecipe(object obj)
 		{
-			if (obj != null && obj is string name)
+			if (obj != null && obj is string name && !string.IsNullOrEmpty(name))
 			{
-				if (!string.IsNullOrEmpty(name))
+				var tabViewModel = Tabs.FirstOrDefault(t => string.Equals(t.TabName, name, StringComparison.OrdinalIgnoreCase));
+				if (tabViewModel != null)
 				{
-					Recipe rec = FindRecipeFromName(name);
-					if (rec != null)
-					{
-						var tabViewModel = Tabs.FirstOrDefault(t => string.Equals(t.TabName, name, StringComparison.OrdinalIgnoreCase));
-						if (tabViewModel != null)
-						{
-							Tabs.Remove(tabViewModel);
-						}
-					}
+					Tabs.Remove(tabViewModel);
 				}
 			}
 		}

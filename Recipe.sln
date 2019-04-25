@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Recipes", "Recipes.csproj", "{3A3BDDEA-F4CB-44D0-9AE7-7310271C4F03}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewModelLib", "..\..\ViewModelLib\ViewModelLib.csproj", "{3A4894A1-992B-4311-9421-E470D41EA383}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,8 +23,19 @@ Global
 		{3A3BDDEA-F4CB-44D0-9AE7-7310271C4F03}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3A3BDDEA-F4CB-44D0-9AE7-7310271C4F03}.Release|x86.ActiveCfg = Release|x86
 		{3A3BDDEA-F4CB-44D0-9AE7-7310271C4F03}.Release|x86.Build.0 = Release|x86
+		{3A4894A1-992B-4311-9421-E470D41EA383}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A4894A1-992B-4311-9421-E470D41EA383}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A4894A1-992B-4311-9421-E470D41EA383}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3A4894A1-992B-4311-9421-E470D41EA383}.Debug|x86.Build.0 = Debug|Any CPU
+		{3A4894A1-992B-4311-9421-E470D41EA383}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A4894A1-992B-4311-9421-E470D41EA383}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A4894A1-992B-4311-9421-E470D41EA383}.Release|x86.ActiveCfg = Release|Any CPU
+		{3A4894A1-992B-4311-9421-E470D41EA383}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4D55A3F3-F4C2-492F-93C9-9C14F611893D}
 	EndGlobalSection
 EndGlobal

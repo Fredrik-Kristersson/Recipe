@@ -1,14 +1,10 @@
-﻿namespace Recipes.ViewModel
+﻿using System.ComponentModel.Composition;
+
+namespace Recipes.ViewModel
 {
+	[Export(typeof(ITabRecipeContentViewModel))]
 	public class TabRecipeContentViewModel : TabViewModelBase, ITabRecipeContentViewModel
 	{
-		public TabRecipeContentViewModel(Recipe model)
-		{
-			Name = model.Name;
-			Description = model.Description;
-			Image = model.Image;
-		}
-
 		public override string TabName => Name;
 
 		public override bool IsCloseable => true;
