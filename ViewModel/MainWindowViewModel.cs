@@ -21,6 +21,12 @@ namespace Recipes.ViewModel
 		private readonly IContainer container;
 		private ILog log;
 
+		[Import]
+		public ITabRecipeContentViewModel RecipeContentViewModel { get; set; }
+
+		[Import]
+		public IMainTabViewModel RecipesListViewModel { get; set; }
+
 		[ImportingConstructor]
 		public MainWindowViewModel(
 			IRecipeService recipeService,
@@ -39,12 +45,14 @@ namespace Recipes.ViewModel
 			OpenSourceCommand = commandFactory.CreateCommand(OpenSource);
 			EditRecipeCommand = commandFactory.CreateCommand(EditRecipe);
 			AddRecipeCommand = commandFactory.CreateCommand(AddRecipe);
-			OpenRecipeCommand = commandFactory.CreateCommand(OpenRecipe);
+			//OpenRecipeCommand = commandFactory.CreateCommand(OpenRecipe);
 			CloseRecipeCommand = commandFactory.CreateCommand(CloseRecipe);
 			RemoveRecipeCommand = commandFactory.CreateCommand(RemoveRecipe);
+			ExitCommand = commandFactory.CreateCommand(OnExit);
 
 			Tabs.Add(MainTab);
 		}
+
 
 		public ObservableCollection<Recipe> Recipes => MainTab.Recipes;
 
@@ -54,6 +62,7 @@ namespace Recipes.ViewModel
 		public ICommand CloseRecipeCommand { get; }
 		public ICommand OpenRecipeCommand { get; }
 		public ICommand RemoveRecipeCommand { get; }
+		public ICommand ExitCommand { get; }
 
 		public ObservableCollection<ITabViewModelBase> Tabs { get; }
 
@@ -99,7 +108,7 @@ namespace Recipes.ViewModel
 				{
 					Name = recipeDialogViewModel.Name,
 					Description = recipeDialogViewModel.Description,
-					Grade = GradeConverter.Convert(recipeDialogViewModel.Grade),
+					Grade = recipeDialogViewModel.Grade,
 					Image = recipeDialogViewModel.Image,
 					Source = recipeDialogViewModel.Source,
 					Url = recipeDialogViewModel.Source
@@ -136,7 +145,7 @@ namespace Recipes.ViewModel
 			var oldRecipe = MainTab.SelectedRecipe;
 			recipeDialogViewModel.Name = oldRecipe.Name;
 			recipeDialogViewModel.Description = oldRecipe.Description;
-			recipeDialogViewModel.Grade = GradeConverter.Convert(oldRecipe.Grade);
+			recipeDialogViewModel.Grade = oldRecipe.Grade;
 			recipeDialogViewModel.Source = oldRecipe.Source;
 			recipeDialogViewModel.Image = oldRecipe.Image;
 
@@ -147,7 +156,7 @@ namespace Recipes.ViewModel
 					Id = oldRecipe.Id,
 					Name = recipeDialogViewModel.Name,
 					Description = recipeDialogViewModel.Description,
-					Grade = GradeConverter.Convert(recipeDialogViewModel.Grade),
+					Grade = recipeDialogViewModel.Grade,
 					Image = recipeDialogViewModel.Image,
 					Source = recipeDialogViewModel.Source,
 					Url = recipeDialogViewModel.Source
@@ -162,32 +171,32 @@ namespace Recipes.ViewModel
 			return MainTab.Recipes.FirstOrDefault(curr => curr.Name.Equals(name));
 		}
 
-		private void OpenRecipe(object obj)
-		{
-			if (obj != null && obj is string name)
-			{
-				try
-				{
-					if (!string.IsNullOrEmpty(name))
-					{
-						Recipe rec = FindRecipeFromName(name);
-						if (rec != null)
-						{
-							var tabViewModel = new TabRecipeContentViewModel();
-							tabViewModel.Name = rec.Name;
-							tabViewModel.Description = rec.Description;
-							tabViewModel.Image = rec.Image;
-							Tabs.Add(tabViewModel);
-							TabSelectedIndex = Tabs.Count - 1;
-						}
-					}
-				}
-				catch (Exception ex)
-				{
-					log.Error("Error occurred!", ex);
-				}
-			}
-		}
+		//private void OpenRecipe(object obj)
+		//{
+		//	if (obj != null && obj is string name)
+		//	{
+		//		try
+		//		{
+		//			if (!string.IsNullOrEmpty(name))
+		//			{
+		//				Recipe rec = FindRecipeFromName(name);
+		//				if (rec != null)
+		//				{
+		//					var tabViewModel = new TabRecipeContentViewModel();
+		//					tabViewModel.Name = rec.Name;
+		//					tabViewModel.Description = rec.Description;
+		//					tabViewModel.Image = rec.Image;
+		//					Tabs.Add(tabViewModel);
+		//					TabSelectedIndex = Tabs.Count - 1;
+		//				}
+		//			}
+		//		}
+		//		catch (Exception ex)
+		//		{
+		//			log.Error("Error occurred!", ex);
+		//		}
+		//	}
+		//}
 
 		private void CloseRecipe(object obj)
 		{
@@ -200,5 +209,11 @@ namespace Recipes.ViewModel
 				}
 			}
 		}
+
+		private void OnExit(object obj)
+		{
+			Close();
+		}
+
 	}
 }

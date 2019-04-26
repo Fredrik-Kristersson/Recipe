@@ -5,6 +5,15 @@ namespace Recipes.Model
 {
 	public class Recipe : ViewModelBase
 	{
+		public bool IsSelected
+		{
+			get => Get<bool>();
+			set
+			{
+				Set(value);
+			}
+		}
+
 		public int Id
 		{
 			get => Get<int>();
@@ -17,9 +26,9 @@ namespace Recipes.Model
 			set => Set(value);
 		}
 
-		public string Grade
+		public double Grade
 		{
-			get => Get<string>();
+			get => Get<double>();
 			set => Set(value);
 		}
 

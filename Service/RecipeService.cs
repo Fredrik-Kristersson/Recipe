@@ -36,7 +36,7 @@ namespace Recipes.Service
 		{
 			RecipeVO edited = ActiveRecordBase<RecipeVO>.Find(recipe.Id);
 			edited.Description = recipe.Description;
-			edited.Grade = recipe.Grade;
+			edited.Grade = GradeConverter.Convert(recipe.Grade);
 			edited.Image = recipe.Image;
 			edited.Name = recipe.Name;
 			edited.Source = recipe.Source;
@@ -63,7 +63,7 @@ namespace Recipes.Service
 			Recipe curr = new Recipe();
 			curr.Id = recipe.Id;
 			curr.Name = recipe.Name;
-			curr.Grade = recipe.Grade;
+			curr.Grade = GradeConverter.Convert(recipe.Grade);
 			curr.Image = recipe.Image;
 			curr.Source = recipe.Source;
 			curr.Url = recipe.Url;
@@ -76,7 +76,7 @@ namespace Recipes.Service
 			RecipeVO curr = new RecipeVO();
 			curr.Id = recipe.Id;
 			curr.Name = recipe.Name;
-			curr.Grade = recipe.Grade;
+			curr.Grade = GradeConverter.Convert(recipe.Grade);
 			curr.Image = recipe.Image;
 			curr.Source = recipe.Source;
 			curr.Url = recipe.Url;

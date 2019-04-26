@@ -10,6 +10,7 @@ namespace Recipes.ViewModel
 	public class MainTabViewModel : TabViewModelBase, IMainTabViewModel
 	{
 		private readonly IRecipeService recipeService;
+		private readonly IEventMessenger eventMessenger;
 
 		[ImportingConstructor]
 		public MainTabViewModel(
@@ -22,12 +23,21 @@ namespace Recipes.ViewModel
 			this.recipeService = recipeService;
 
 			UpdateRecipes();
+			this.eventMessenger = eventMessenger;
 		}
 
 		public Recipe SelectedRecipe
 		{
 			get => Get<Recipe>();
-			set => Set(value);
+			set
+			{
+				Set(value);
+				if (value != null)
+				{
+					eventMessenger.Publish(new RecipeSelectedEvent(value));
+				}
+
+			}
 		}
 
 		public ObservableCollection<Recipe> Recipes { get; }
