@@ -3,13 +3,18 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:clr="clr-namespace:System;assembly=mscorlib"
 	xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+	mc:Ignorable="d"
 	xmlns:viewmodel="clr-namespace:Recipes.ViewModel"
 	x:Class="Recipes.View.MainWindow"
 	xmlns:local="clr-namespace:Recipes"
 	xmlns:view="clr-namespace:Recipes.View"
 	Title="Recipe store"
 	Width="800" Height="600"
-	MinHeight="200" MinWidth="200">
+	MinHeight="200" MinWidth="200"
+	
+	d:DataContext="{d:DesignInstance viewmodel:MainWindowViewModel, IsDesignTimeCreatable=True}">
 
 	<Window.Resources>
 
@@ -34,7 +39,7 @@
 			</Menu>
 			<ToolBar Grid.Row="1" Grid.ColumnSpan="3">
 				<Button Content="Add Recipe..." Command="{Binding AddRecipeCommand}"/>
-			<Button Content="Edit Recipe..." Command="{Binding EditRecipeCommand}"/>
+				<Button Content="Edit Recipe..." Command="{Binding EditRecipeCommand}"/>
 		</ToolBar>
 		<view:RecipesList
 				Grid.Row="2"

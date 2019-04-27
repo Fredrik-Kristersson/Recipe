@@ -20,26 +20,34 @@
 								<Grid>
 									<Border 
 										x:Name="Bd" 
-										BorderBrush="Transparent"
-										BorderThickness="0,1,0,1"
-										Margin="0,1,0,1"
+										BorderBrush="#009ddc"
+										BorderThickness="0,0,0,1"
+										Margin="1"
 										HorizontalAlignment="Stretch" 
 										VerticalAlignment="Stretch"
 										Background="Transparent">
 										<Grid
 											HorizontalAlignment="Stretch">
 											<Grid.ColumnDefinitions>
-												<ColumnDefinition Width="Auto"/>
 												<ColumnDefinition Width="*"/>
+												<ColumnDefinition Width="Auto"/>
 											</Grid.ColumnDefinitions>
+											<Grid.RowDefinitions>
+												<RowDefinition Height="Auto"/>
+												<RowDefinition Height="Auto"/>
+											</Grid.RowDefinitions>
 											<TextBlock 
-												FontSize="14"
+												TextTrimming="CharacterEllipsis"
+												FontSize="16"
 												VerticalAlignment="Top"
 												HorizontalAlignment="Left"
 												Margin="1,-3,1,0" 
 												x:Name="NameTextBox"
 												Text="{Binding Name}"/>
 											<StackPanel
+												
+												Grid.Row="1"
+												Margin="3"
 												VerticalAlignment="Bottom"
 												Grid.Column="0"
 												Orientation="Horizontal"
@@ -66,9 +74,10 @@
 												Text="{Binding Grade}"/>
 											</StackPanel>
 											<Image
+												Grid.RowSpan="2"
 												Stretch="UniformToFill"
 												Grid.Column="1"
-												Height="30"
+												Height="50"
 												HorizontalAlignment="Right"
 												Source="{Binding Image}"/>
 										</Grid>
@@ -77,13 +86,13 @@
 								<ControlTemplate.Triggers>
 									<Trigger Property="IsSelected" Value="True">
 										<Setter TargetName="NameTextBox" Property="FontWeight" Value="Bold"/>
-										<Setter TargetName="Bd" Property="BorderBrush" Value="#009ddc"/>
+										<Setter TargetName="Bd" Property="BorderBrush" Value="Blue"/>
+										<Setter TargetName="Bd" Property="BorderThickness" Value="1"/>
 									</Trigger>
 									<Trigger Property="IsMouseOver" Value="True">
-										<Setter 
-											TargetName="Bd" 
-											Property="BorderBrush" 
-											Value="LightBlue"/>
+										<Setter TargetName="Bd" Property="BorderBrush" Value="LightBlue"/>
+										<Setter TargetName="Bd" Property="BorderThickness" Value="1" />
+										<Setter TargetName="Bd" Property="Background" Value="LightGray" />
 									</Trigger>
 								</ControlTemplate.Triggers>
 							</ControlTemplate>
